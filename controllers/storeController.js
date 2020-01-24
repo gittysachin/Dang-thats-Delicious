@@ -22,11 +22,11 @@ const multerOptions = {
 
 // exports.myMiddleWare = (req, res, next) => {
 // 	req.name = 'Sachin';
-// 	// res.cookie('name', 'Sachin is cool', { maxAge: 2220 });  // look at application in dev tools
+	// res.cookie('name', 'Sachin is cool', { maxAge: 2220 });  // look at application in dev tools
 	
-// 	// if(req.name === 'Sachin'){  // http://localhost:7777
-// 	// 	throw Error('That is a stupid name');
-// 	// }
+	// if(req.name === 'Sachin'){  // http://localhost:7777
+	// 	throw Error('That is a stupid name');
+	// }
 // 	next();
 // }
 
@@ -68,7 +68,8 @@ exports.createStore = async (req, res) => {
 	// res.json(req.body); // send all of the data immediately back to the user that we sent using the form
 	
 	// const store = new Store(req.body);
-	// await store.save();
+    // await store.save();
+    req.body.author = req.user._id;
 	const store = await (new Store(req.body)).save();
 	req.flash('success', `Successfully Created ${store.name}. Care to leave a review?`);
 	res.redirect(`/store/${store.slug}`);
@@ -157,7 +158,7 @@ exports.updateStore = async (req, res) => {
 
 exports.getStoreBySlug = async (req, res, next) => {
     // res.send('It Works!');
-    const store = await (await Store.findOne({ slug: req.params.slug })).populated('author');  // populate will associate the details of author and reviews with this data, you can see that by doing h.dump
+    const store = await Store.findOne({ slug: req.params.slug }).populate('author');  // populate will associate the details of author and reviews with this data, you can see that by doing h.dump
     if(!store) return next(); // It's gonna execute the next middleware named as errorHandlers.notFound 
     // res.json(store);
     res.render('store', { store, title: store.name });
@@ -224,12 +225,11 @@ exports.heartStore = async (req, res) => {
     const hearts = req.user.hearts.map(obj => obj.toString());
     const operator = hearts.includes(req.params.id) ? '$pull' : '$addToSet';
     const user = await User
-        .findByIdAndUpdate(req.user.id, 
-            { [operator]: { hearts: req.params.id } },
-            { new: true }
-        )
+      .findByIdAndUpdate(req.user._id,
+        { [operator]: { hearts: req.params.id } },
+        { new: true });
     res.json(user);
-}
+  };
 
 exports.getHearts = async (req, res) => {
     const stores = await Store.find({
