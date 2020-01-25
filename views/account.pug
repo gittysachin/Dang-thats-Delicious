@@ -2,10 +2,10 @@ extends layout
 
 block content
   .inner
-    h2 Edit Your Account
-    form(action="/account" method="POST")
+    form#accountForm(action="/account" method="post" name="accountForm")
+      h2 Edit Your Account
       label(for="name") Name
-      input(type="text" name="name" value=user.name)
+      input#name(type="text" name="name" value=user.name required)
       label(for="email") Email Address
-      input(type="email" name="email" value=user.email)
-      input.button(type="submit" value="Update My Account")
+      input#email(type="email" name="email" value=user.email required)
+      input.button(type="submit" value="Update my Account ➡")

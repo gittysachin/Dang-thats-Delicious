@@ -1,85 +1,89 @@
 // we use mongoose to interface with our mongoDB 
 
 const mongoose = require('mongoose');
-mongoose.Promise = global.Promise; // We can wait for data to come back from database with async await using build-in ES6 promise
+const slug = require('slugs');  // this allows us to mamke url friendly names, its sort of like wordpress permalink
+
+mongoose.Promise = global.Promise;  // We can wait for data to come back from database with async await using build-in ES6 promise
 // we can use the built-in callbacks, we can use external libraries
 // open devTool and type 'Promise' in console
-const slug = require('slugs'); // this allows us to mamke url friendly names, its sort of like wordpress permalink
 
 const storeSchema = new mongoose.Schema({
-  // name: String,
-  // trim will take out the white spaces oin either end of string
   name: {
-      type: String,
-      trim: true,
-      required: 'Please enter a store name!'
+    type: String,
+    trim: true,
+    required: 'Please enter a store name',
   },
   slug: String,
   description: {
-      type: String,
-      trim: true
+    type: String,
+    trim: true,
   },
   tags: [String],
   created: {
-      type: Date,
-      default: Date.now
+    type: Date,
+    default: Date.now,
   },
   location: {
-      type: {
-          type: String,
-          default: 'Point'
+    type: {
+      type: String,
+      default: 'Point',
+    },
+    coordinates: [
+      {
+        type: Number,
+        required: 'You must supply coordinates',
       },
-      coordinates: [{
-          type: Number,
-          required: 'You must supply coordinates!'
-      }],
-      address: {
-          type: String,
-          required: 'You must supply an address!'
-      }
+    ],
+    address: {
+      type: String,
+      required: 'You must supply an address',
+    },
   },
   photo: String,
   author: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: 'You must supply and author'
-  }
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: 'You must supply an author',
+  },
 }, {
   toJSON: { virtuals: true },
-  toObject: { virtuals: true }
+  toObject: { virtuals: true },
 });
 
-// Define our indexes 
+// Define our indexes
 storeSchema.index({
   name: 'text',
-  description: 'text'
-});                           // check in the index of stores of our database in Atlas
+  description: 'text',
+});
+              // check in the index of stores of our database in Atlas
 
-storeSchema.index({ location: '2dsphere' });  // there it will show that the type is GEOSPATIAL
+storeSchema.index({ location: '2dsphere' });    // there it will show that the type is GEOSPATIAL
 
 // we have used pre-saved hook for mongoDB --> we are going to autogenerate this slug field before saving
-storeSchema.pre('save', async function(next){
-  if(!this.isModified()){
-      return next();
+storeSchema.pre('save', async function(next) {
+  if (!this.isModified('name')) {
+    return next();
   }
   this.slug = slug(this.name);
-// find other stores that have a slug of sachin, sachin-1, sachin-2
-  const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, 'i'); // here 'i' in second parameter is for case insensitive
-  const storesWithSlug = await this.constructor.find({ slug: slugRegEx }); // this.constructor will be equal to Store by the time it runs 
-  if( storesWithSlug.length ){ 
-      this.slug = `${this.slug}-${storesWithSlug.length + 1}`;
+  // find other stores that have a slug of sachin, sachin-1, sachin-2
+  const slugRegex = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, 'i');  // here 'i' in second parameter is for case insensitive
+  // search db for matching slugs
+  const storesWithSlug = await this.constructor.find({ slug: slugRegex });
+  if (storesWithSlug.length) {
+    // found existing slug(s), update url to next number
+    this.slug = `${this.slug}-${storesWithSlug.length + 1}`;
   }
-  next();
-})
+  return next();
+});
 
 storeSchema.statics.getTagsList = function() {
-  // aggregate pipeline operator
   return this.aggregate([
-      { $unwind: '$tags' },
-      { $group: { _id: '$tags', count: { $sum: 1 } } }, // we are grouping it by id and created new property count which is going to be equal to sum of 1
-      { $sort: { count: -1 } }
+    // all mongo aggregate pipeline operators begin with $
+    { $unwind: '$tags' }, // $tags note: $ denotes tags is a field on the document
+    { $group: { _id: '$tags', count: { $sum: 1 } } }, // group by $tag values, place into object as property '_id', add count attributee and increase by 1 for each tag
+    { $sort: { count: -1 } }, // 1/-1 on $sort is ascending/descending
   ]);
-}
+};
 
 storeSchema.statics.getTopStores = function() {
   return this.aggregate([
@@ -107,6 +111,7 @@ storeSchema.statics.getTopStores = function() {
 
 // find reviews where the store's _id property === review's store property
 // this is sort of a join but it's nice virtual field so that we're actually not saving sort of the relationship between the two, it's just 100% virtual
+// make reviews available via the store
 storeSchema.virtual('reviews', {
   ref: 'Review', // which model to link
   localField: '_id', // which field on the store

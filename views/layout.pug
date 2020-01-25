@@ -38,22 +38,17 @@ html
 
     block messages
       if locals.flashes
-        br()
-        //- pre= h.dump(locals) // this dump is coming from helpers.js file 
-        //- pre= h.dump(locals.flashes)
         .inner
           .flash-messages
             - const categories = Object.keys(locals.flashes)
             each category in categories
               each message in flashes[category]
                 .flash(class=`flash--${category}`)
-                  p.flash__text!= message 
-                  //- This bang not equal to message is for the html embedded code ---> Other wise html code will also be taken as text
+                  p.flash__text!= message
                   button.flash__remove(onClick="this.parentElement.remove()") &times;
     .content
       block content
-        p This is the default
 
     block scripts
       script(src=`https://maps.googleapis.com/maps/api/js?key=${process.env.MAP_KEY}&libraries=places`)
-      script(src="/dist/App.bundle.js")
+      script(src="/dist/app.bundle.js")

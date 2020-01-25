@@ -33,11 +33,10 @@ const userSchema = new mongoose.Schema({
 // And to do that, we're going to use a package called passportjs
 // Essentially it takes away all of the heavy lifting that comes along with managing the session, creting token, logging people in and out for popular interface providers like Google, Facebook, github
 
-
 // We don't really need to make another property named gravatar. It can be use used with Virtual Field. Sometimes fields can be generated.
 
 userSchema.virtual('gravatar').get(function() {
-    return `https://gravatar.com/avatar/${md5(this.email)}?s=200`;
+  return `https://gravatar.com/avatar/${md5(this.email)}?s=200`;
 });
 
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });

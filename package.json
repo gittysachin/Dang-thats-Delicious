@@ -1,71 +1,137 @@
 {
-  "name": "delicious-food-stores",
-  "version": "1.0.0",
+  "name": "that-be-delicious",
+  "version": "0.0.2",
   "private": true,
   "engines": {
-    "node": ">= 7.6.0"
+    "node": ">= 10.x"
   },
   "scripts": {
-    "prod": "node ./start.js",
-    "dev": "concurrently \"npm run watch\" \"npm run assets\" --names \"💻,📦\" --prefix name",
-    "build": "concurrently \"npm run watch\" \"npm run assets\" --names \"💻,📦\" --prefix name",
-    "watch": "nodemon ./start.js --ignore public/",
-    "start": "concurrently \"npm run watch\" \"npm run assets\" --names \"💻,📦\" --prefix name",
     "assets": "webpack -w --display-max-modules 0",
-    "sample": "node ./data/load-sample-data.js",
     "blowitallaway": "node ./data/load-sample-data.js --delete",
-    "now": "now -e DB_USER=@db_user -e DB_PASS=@db_pass -e NODE_ENV=\"production\" -e PORT=80"
+    "dev": "concurrently \"yarn watch\" \"yarn assets\" --names \"🤖,📦\" --prefix name",
+    "sample": "node ./data/load-sample-data.js",
+    "start": "node ./start.js",
+    "watch": "nodemon ./start.js --inspect --ignore public/",
+    "snyk-protect": "snyk protect",
+    "prepublish": "yarn snyk-protect",
+    "test": "snyk test"
   },
-  "browserslist": "last 3 versions",
+  "browserslist": {
+    "development": [
+      "last 1 version"
+    ],
+    "production": [
+      "> 1%",
+      "last 2 versions",
+      "not ie <= 10"
+    ]
+  },
   "dependencies": {
-    "axios": "0.19.1",
-    "body-parser": "1.19.0",
-    "connect-flash": "0.1.1",
-    "connect-mongo": "3.2.0",
-    "cookie-parser": "1.4.4",
-    "dompurify": "2.0.7",
-    "dotenv": "8.2.0",
-    "es6-promisify": "6.0.2",
-    "express": "4.17.1",
-    "express-session": "1.17.0",
-    "express-validator": "^5.3.1",
-    "faker": "4.1.0",
-    "forever": "2.0.0",
-    "glob": "7.1.6",
-    "html-to-text": "5.1.1",
-    "jimp": "0.9.3",
-    "juice": "6.0.0",
-    "md5": "2.2.1",
-    "moment": "2.24.0",
-    "mongoose": "^5.8.7",
-    "mongoose-mongodb-errors": "0.0.2",
-    "multer": "1.4.2",
-    "nodemailer": "6.4.2",
-    "passport": "0.4.1",
+    "axios": "^0.19.2",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^3.2.0",
+    "cookie-parser": "^1.4.4",
+    "dayjs": "^1.8.19",
+    "dompurify": "^2.0.7",
+    "dotenv": "^8.2.0",
+    "es6-promisify": "^6.0.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "express-validator": "^6.3.1",
+    "faker": "^4.1.0",
+    "glob": "^7.1.6",
+    "html-to-text": "^5.1.1",
+    "jimp": "^0.9.3",
+    "juice": "^6.0.0",
+    "md5": "^2.2.1",
+    "mongoose": "^5.8.9",
+    "mongoose-mongodb-errors": "^0.0.2",
+    "multer": "^1.4.2",
+    "nodemailer": "^6.4.2",
+    "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "passport-local-mongoose": "6.0.1",
-    "pug": "2.0.4",
-    "slugs": "0.1.3",
-    "uglifyjs-webpack-plugin": "^2.2.0",
-    "uuid": "3.3.3",
-    "validator": "12.1.0",
-    "webpack-cli": "^3.3.10"
+    "passport-local-mongoose": "^6.0.1",
+    "pug": "^2.0.4",
+    "slugs": "^0.1.3",
+    "snyk": "^1.280.0",
+    "uuid": "^3.4.0",
+    "validator": "^12.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.0",
-    "@babel/preset-env": "^7.8.0",
-    "autoprefixer": "9.7.3",
-    "babel-core": "6.26.3",
-    "babel-loader": "8.0.6",
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "autoprefixer": "^9.7.4",
+    "babel-loader": "^8.0.6",
     "babel-preset-env": "^1.7.0",
-    "concurrently": "5.0.2",
-    "css-loader": "3.4.1",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "node-sass": "^4.13.0",
+    "concurrently": "^5.0.2",
+    "css-loader": "^3.4.2",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-html": "^6.0.0",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-markdown": "^1.0.1",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.13.1",
     "nodemon": "^2.0.2",
-    "now": "^16.7.3",
-    "postcss-loader": "3.0.0",
-    "sass-loader": "8.0.0",
-    "webpack": "4.41.5"
-  }
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^8.0.2",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpackbar": "^4.0.0"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "ecmaVersion": "2018"
+    },
+    "env": {
+      "browser": true,
+      "es6": true,
+      "node": true
+    },
+    "extends": [
+      "airbnb-base",
+      "eslint-config-prettier"
+    ],
+    "plugins": [
+      "import",
+      "html",
+      "markdown"
+    ],
+    "rules": {
+      "func-names": "off",
+      "no-console": "warn",
+      "no-unused-vars": [
+        "warn",
+        {
+          "argsIgnorePattern": "res|next|^err"
+        }
+      ],
+      "max-len": "off",
+      "no-underscore-dangle": "off",
+      "space-before-function-paren": "off"
+    }
+  },
+  "prettier": {
+    "arrowParens": "avoid",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "plugins": [
+      "all"
+    ],
+    "printWidth": 102,
+    "proseWrap": "always",
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "all",
+    "useTabs": false
+  },
+  "snyk": true
 }
